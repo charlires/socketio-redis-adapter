@@ -1,0 +1,31 @@
+services:
+  redis_subs:
+    image: redis
+    ports: 
+    - "6379"
+  sockets_server: 
+    build: .
+    volumes:
+      - ./server/index.js:/app/index.js
+    command: node index.js
+    deploy:
+      mode: replicated
+      replicas: 3
+    environment:
+      - REDIS_HOST=redis_subs
+      - REDIS_PORT=6379
+      - PORT=3000
+    ports:
+      - "3000"
+    depends_on:
+      - redis_subs
+  nginx_lb: 
+    image: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "4000:4000"
+    depends_on:
+      - sockets_server
+    logging:
+      driver: none

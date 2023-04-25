@@ -1,0 +1,30 @@
+# my-scenario.yml
+config:
+  target: "http://localhost:4000"
+  phases:
+    - duration: 2
+      arrivalRate: 10
+  socketio: 
+    transports: ["websocket"]
+
+scenarios:
+  - name: My sample scenario
+    engine: socketio # Enable the Socket.IO engine
+    flow:
+      # wait for the WebSocket upgrade (optional)
+      - think: 1
+
+      # basic emit
+      - emit:
+          channel: "user:register"
+          data: "test-{{$randomString()}}" # socio id
+
+      # emit an object
+      - emit:
+          channel: "user:ping"
+          data: "test-342342342"
+
+      # do nothing for 30 seconds then disconnect
+      - think: 1
+
+      # npx artillery run test.yml
